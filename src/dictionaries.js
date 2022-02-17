@@ -8224,6 +8224,7 @@ const matchDict = [
   "shute",
   "shuts",
   "shwas",
+  "shyam",
   "shyer",
   "sials",
   "sibbs",

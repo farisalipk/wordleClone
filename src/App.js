@@ -65,7 +65,6 @@ const keyList = {
 const [matchDict, wordDict] = returnLists;
 const wordColors = [];
 const wordToGuess = wordDict[Math.floor(Math.random() * wordDict.length)];
-
 function App() {
   const [currBoard, setCurrBoard] = useState(
     Array.from({ length: 6 }, () => Array.from({ length: 5 }, () => null))
@@ -90,45 +89,64 @@ function App() {
     console.log(wordToGuess);
     let localColors = [...currColors];
     let greenList = [];
-    let yellowList = [];
+    let yellowList = {};
     let letter = "";
 
-    let letterCounts = wordToGuess.split("").reduce((dict, curr) => {
-      if (dict[curr]) {
-        dict[curr]++;
-      } else {
-        dict[curr] = 1;
-      }
-      return dict;
-    }, {});
-    //set all to grays
+    //letterCounts will store each letter and how many times it appears in the word
+    let letterCounts = {};
+
+    //set all to grays and fill letterCounts dict
     for (let index = 0; index < 5; index++) {
       localColors[currRow][index] = "letterbox gray";
-    }
-    //set all greens
-    for (let index = 0; index < 5; index++) {
-      letter = currBoard[currRow][index];
-      if (wordToGuess[index] === letter) {
-        localColors[currRow][index] = "letterbox green";
-        letterCounts[letter]--;
-        greenList.push(letter);
+      keyList[currBoard[currRow][index]] = "keyCap gray";
+      let wordLetter = wordToGuess[index];
+      if (letterCounts[wordLetter]) {
+        letterCounts[wordLetter]++;
+      } else {
+        letterCounts[wordLetter] = 1;
       }
     }
+
+    //set all colors appropriately
+    for (let index = 0; index < 5; index++) {
+      let letter = currBoard[currRow][index];
+      if (wordToGuess[index] === letter) {
+        let yellowInd = yellowList[letter];
+        if (yellowInd > -1 && yellowInd < index && letterCounts[letter] === 0) {
+          localColors[currRow][yellowInd] = "letterbox gray";
+        }
+        keyList[letter] = "keyCap green";
+        localColors[currRow][index] = "letterbox green";
+        greenList.push(letter);
+      } else {
+        /*not green*/
+        if (letterCounts[letter] > 0) {
+          /*yellow*/
+          yellowList[letter] = index;
+          localColors[currRow][index] = "letterbox yellow";
+          keyList[letter] = "keyCap yellow";
+        }
+      }
+      letterCounts[letter]--;
+    }
+
+    /*
     //set yellows
     for (let index = 0; index < 5; index++) {
       letter = currBoard[currRow][index];
       if (letterCounts[letter] > 0) {
         if (wordToGuess.indexOf(letter) > -1) {
           localColors[currRow][index] = "letterbox yellow";
-          letterCounts[letter]--;
-          yellowList.push(letter);
+          yellowList[letter] = index;
         }
       }
       let letterColor = localColors[currRow][index].slice(9);
       if (letterColor !== "green") {
-        keyList[letter] = "keyCap " + letterColor;
+        keyList[letter] = "keyCap" + letterColor;
       }
     }
+    letterCounts[letter]--;
+*/
     setCurrColors(localColors);
   };
 
@@ -166,7 +184,7 @@ function App() {
   return (
     <div className="App" /*onKeyDown={(event) => handleKeyClick(event.key)}*/>
       <header className="App-header">
-        <p className="Title">Welcome to Wurdle</p>
+        <p className="Title">WalmartWordle</p>
         <Board
           max_guesses={6}
           max_letters={5}
