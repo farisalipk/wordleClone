@@ -65,6 +65,7 @@ const keyList = {
 const [matchDict, wordDict] = returnLists;
 const wordColors = [];
 const wordToGuess = wordDict[Math.floor(Math.random() * wordDict.length)];
+let gameOver = false;
 function App() {
   const [currBoard, setCurrBoard] = useState(
     Array.from({ length: 6 }, () => Array.from({ length: 5 }, () => null))
@@ -90,7 +91,6 @@ function App() {
     let localColors = [...currColors];
     let greenList = [];
     let yellowList = {};
-    let letter = "";
 
     //letterCounts will store each letter and how many times it appears in the word
     let letterCounts = {};
@@ -129,24 +129,6 @@ function App() {
       }
       letterCounts[letter]--;
     }
-
-    /*
-    //set yellows
-    for (let index = 0; index < 5; index++) {
-      letter = currBoard[currRow][index];
-      if (letterCounts[letter] > 0) {
-        if (wordToGuess.indexOf(letter) > -1) {
-          localColors[currRow][index] = "letterbox yellow";
-          yellowList[letter] = index;
-        }
-      }
-      let letterColor = localColors[currRow][index].slice(9);
-      if (letterColor !== "green") {
-        keyList[letter] = "keyCap" + letterColor;
-      }
-    }
-    letterCounts[letter]--;
-*/
     setCurrColors(localColors);
   };
 
@@ -154,30 +136,51 @@ function App() {
     guessWord = currBoard[currRow].reduce((prev, curr) => {
       return (prev += curr);
     }, "");
-    if (matchDict.includes(guessWord) || wordDict.includes(guessWord)) {
+    if (gameOver) {
+      alert("game over!");
+    } else if (matchDict.includes(guessWord) || wordDict.includes(guessWord)) {
       colorGuess();
-      setCurrRow(currRow + 1);
+      let gameWon = true;
+      for (let index = 0; index < 5; index++) {
+        if (currColors[currRow][index] !== "letterbox green") {
+          gameWon = false;
+        }
+      }
+      if (gameWon) {
+        document.getElementById("wB").className = "winBox show";
+        setTimeout(() => {
+          document.getElementById("wB").className = "winBox";
+        }, 4000);
+        gameOver = true;
+      } else {
+        setCurrRow(currRow + 1);
+      }
     } else {
-      console.log("invalid guess:(");
+      document.getElementById("iB").className = "invalidBox show";
+      setTimeout(() => {
+        document.getElementById("iB").className = "invalidBox";
+      }, 1500);
       clearRow(currRow);
     }
     setCurrCol(0);
   };
 
   const handleKeyClick = (letter) => {
-    if (letter === "Backspace" && currCol !== 0) {
-      let newBoard = [...currBoard];
-      let prevCol = currCol;
-      newBoard[currRow][prevCol - 1] = null;
-      setCurrBoard(newBoard);
-      setCurrCol(currCol - 1);
-    } else if (letter === "Enter" && currCol === 5) {
-      handleValidGuess();
-    } else if (alphabet.includes(letter) && currCol < 5) {
-      let newBoard = [...currBoard];
-      newBoard[currRow][currCol] = letter;
-      setCurrBoard(newBoard);
-      setCurrCol(currCol + 1);
+    if (!gameOver) {
+      if (letter === "Backspace" && currCol !== 0) {
+        let newBoard = [...currBoard];
+        let prevCol = currCol;
+        newBoard[currRow][prevCol - 1] = null;
+        setCurrBoard(newBoard);
+        setCurrCol(currCol - 1);
+      } else if (letter === "Enter" && currCol === 5) {
+        handleValidGuess();
+      } else if (alphabet.includes(letter) && currCol < 5) {
+        let newBoard = [...currBoard];
+        newBoard[currRow][currCol] = letter;
+        setCurrBoard(newBoard);
+        setCurrCol(currCol + 1);
+      }
     }
   };
 
@@ -197,6 +200,12 @@ function App() {
           wordColors={wordColors}
           currColors={currColors}
         />
+        <div className="invalidBox" id="iB">
+          Invalid Guess
+        </div>
+        <div className="winBox" id="wB">
+          Good Work!
+        </div>
         <Keyboard
           onClick={(letter) => handleKeyClick(letter)}
           colorsToUpdate={currColors}

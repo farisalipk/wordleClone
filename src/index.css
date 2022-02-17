@@ -80,9 +80,37 @@ body {
   user-select: none;
 }
 
-
-
 .guessrow {
   display: flex;
   flex-direction: row;
+}
+
+.invalidBox {
+  font-weight: bold;
+  font-size: 1rem;
+  visibility: hidden;
+  position:fixed;
+  top: 36%;
+  background-color: rgba(97, 97, 97, 0.619);
+  padding: 1rem;
+  border-radius: 10px;
+}
+
+.invalidBox.show {
+  visibility: visible;
+}
+
+.winBox {
+  font-weight: bold;
+  font-size: 1rem;
+  visibility: hidden;
+  position:fixed;
+  top: 36%;
+  background-color: rgba(97, 97, 97, 0.619);
+  padding: 1rem;
+  border-radius: 10px;
+}
+
+.winBox.show {
+  visibility: visible;
 }
