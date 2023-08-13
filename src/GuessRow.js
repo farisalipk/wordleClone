@@ -13,7 +13,6 @@ function GuessRow(props) {
     setCurrCol,
     wordColors,
     currColors,
-    setCurrColors,
   } = props;
   const createNewRow = () => {
     const row = new Array(max_letters);
